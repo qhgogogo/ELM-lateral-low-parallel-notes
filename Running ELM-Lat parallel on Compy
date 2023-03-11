@@ -1,0 +1,44 @@
+# Step-1: Install PETSc on Compy
+#         This step can be skipped because Gautam's PETSc installation should be accessible
+#         to everyone.
+
+cd /compyfs/bish218/elm_lateral/
+git clone https://gitlab.com/petsc/petsc.git petsc_v3.16.3
+cd petsc_v3.16.3
+git checkout v3.16.3
+
+export PETSC_DIR=$PWD
+
+./configure         \
+--download-hdf5=yes \
+--download-hdf5-fortran-bindings=yes \
+--download-zlib \
+--download-scalapack=yes \
+--download-metis=yes \
+--download-parmetis=yes \
+--download-sowing=1 \
+--with-mpi-dir=/share/apps/intel/2019u4/compilers_and_libraries_2019.4.243/linux/mpi/intel64/ \
+PETSC_ARCH=intel-19-0-5-compy-e3sm
+
+
+# Step-2: Clone Gautam's E3SM repo
+
+cd <dir-of-your-choice>
+
+git clone git@github.com:bishtgautam/e3sm e3sm-bishtgautam
+
+cd e3sm-bishtgautam
+git checkout bishtgautam/lnd/hanqiu_lateral_flow_mDarcy_parallel
+
+git pull --ff-only
+git submodule update --init
+
+# Step-3: Create/build/run the case
+cd cime/scripts
+
+cp /compyfs/bish218/elm_lateral/scripts/converging_hillslope.parrallel.sh ./
+./converging_hillslope.parrallel.sh
+
+cd <converging-hillslope-parallel*>
+./case.build
+./case.submit
